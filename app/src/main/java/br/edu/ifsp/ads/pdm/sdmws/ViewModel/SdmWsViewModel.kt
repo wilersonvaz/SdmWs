@@ -1,0 +1,73 @@
+package br.edu.ifsp.scl.sdm.pa2.sdmws.viewmodel
+
+import android.app.Application
+import android.util.Log
+import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.MutableLiveData
+import br.edu.ifsp.ads.pdm.sdmws.Model.Curso
+import br.edu.ifsp.scl.sdm.pa2.sdmws.model.Curso
+import br.edu.ifsp.scl.sdm.pa2.sdmws.model.Disciplina
+import br.edu.ifsp.scl.sdm.pa2.sdmws.model.Semestre
+import com.android.volley.Request
+import com.android.volley.RequestQueue
+import com.android.volley.Response
+import com.android.volley.VolleyError
+import com.android.volley.toolbox.JsonObjectRequest
+import com.android.volley.toolbox.Volley
+import com.google.gson.JsonObject
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
+import org.json.JSONObject
+
+class SdmWsViewModel(application: Application): AndroidViewModel(application) {
+    val cursoMld: MutableLiveData<Curso> = MutableLiveData()
+    val semestreMld: MutableLiveData<Semestre> = MutableLiveData()
+    val disciplinaMld: MutableLiveData<Disciplina> = MutableLiveData()
+    private val escopoCorrotinas = CoroutineScope(Dispatchers.IO + Job())
+    private val filaRequisicoesVolley: RequestQueue =
+        Volley.newRequestQueue(application.baseContext)
+
+    companion object {
+        val URL_BASE = "https://nobile.pro.br/sdm_ws"
+        val ENDPOINT_CURSO = "/curso"
+        val ENDPOINT_SEMESTRE = "/semestre"
+        val ENDPOINT_DISCIPLINA = "/disciplina"
+    }
+
+    fun getCurso() {
+        escopoCorrotinas.launch {
+            val urlCurso = "${URL_BASE}${ENDPOINT_CURSO}"
+            val requisicaoCursoJor = JsonObjectRequest(
+                Request.Method.GET,
+                urlCurso,
+                null,
+                { response ->
+                    if (response != null ) {
+                        val curso: Curso = jsonToCurso(response)
+                        cursoMld.postValue(curso)
+                    }
+                },
+                { error -> Log.e(urlCurso, error.toString()) }
+            )
+            filaRequisicoesVolley.add(requisicaoCursoJor)
+        }
+    }
+    fun getSemestre(sid: Int) {
+
+    }
+    fun getDisciplina(sigla: String) {
+
+    }
+
+    private fun jsonToCurso(json: JSONObject): Curso {
+        val curso: Curso = Curso(
+            json.getInt("horas"),
+            json.getString("nome"),
+            json.getInt("semestres"),
+            json.getString("sigla")
+        )
+        return curso
+    }
+}

@@ -87,6 +87,7 @@ class MainActivity : AppCompatActivity() {
                 }
             }
             siglasDisciplinasAdapter.notifyDataSetChanged()
+
         }
 
         sdmWsViewModel.getCurso()

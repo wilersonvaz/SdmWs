@@ -5,9 +5,14 @@ import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import br.edu.ifsp.ads.pdm.sdmws.Model.Curso
-import br.edu.ifsp.scl.sdm.pa2.sdmws.model.Curso
 import br.edu.ifsp.scl.sdm.pa2.sdmws.model.Disciplina
 import br.edu.ifsp.scl.sdm.pa2.sdmws.model.Semestre
+import com.android.volley.Request
+import com.android.volley.RequestQueue
+import com.android.volley.toolbox.JsonArrayRequest
+import com.android.volley.toolbox.JsonObjectRequest
+import com.android.volley.toolbox.Volley
+import com.google.gson.Gson
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -21,6 +26,8 @@ class SdmWsViewModel(application: Application): AndroidViewModel(application) {
     private val escopoCorrotinas = CoroutineScope(Dispatchers.IO + Job())
     private val filaRequisicoesVolley: RequestQueue =
         Volley.newRequestQueue(application.baseContext)
+
+    private val gson: Gson = Gson()
 
     companion object {
         val URL_BASE = "http://nobile.pro.br/sdm_ws"
@@ -39,6 +46,7 @@ class SdmWsViewModel(application: Application): AndroidViewModel(application) {
                 { response ->
                     if (response != null ) {
                         val curso: Curso = jsonToCurso(response)
+//                        val curso : Curso = gson.fromJson(response.toString(), Curso)
                         cursoMld.postValue(curso)
                     }
                 },
